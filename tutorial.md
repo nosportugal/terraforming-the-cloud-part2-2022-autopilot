@@ -316,6 +316,12 @@ A criação do `ingress` será o culminar das últimas operações que efectuamo
 
    * `ingress_enabled = true`
 
+Executar o `init`:
+
+```bash
+terraform init
+```
+
 Executar o `plan` & `apply`:
 
 ```bash
