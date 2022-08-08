@@ -11,14 +11,22 @@
 
 
 ## 2.1. Subnet e NAT para o GKE
-# resource "google_compute_subnetwork" "gke" {
-#   name                     = "${local.prefix}-subnet-gke"
-#   network                  = google_compute_network.default.self_link
-#   ip_cidr_range            = "10.0.11.0/24"
-#   region                   = var.region
-#   project                  = google_compute_network.default.project
-#   private_ip_google_access = true
-# }
+#resource "google_compute_subnetwork" "gke" {
+#  name                     = "${local.prefix}-subnet-gke"
+#  network                  = google_compute_network.default.self_link
+#  ip_cidr_range            = "10.0.11.0/24"
+#  region                   = var.region
+#  project                  = google_compute_network.default.project
+#  private_ip_google_access = true
+#  secondary_ip_range {
+#    range_name    = "${local.prefix}-subnet-gkepods"
+#    ip_cidr_range = "240.0.136.0/21"
+#  }
+#  secondary_ip_range {
+#    range_name    = "${local.prefix}-subnet-gkeservices"
+#    ip_cidr_range = "240.0.128.32/27"
+#  }
+#}
 
 # resource "google_compute_router" "default" {
 #   project = data.google_project.this.name
