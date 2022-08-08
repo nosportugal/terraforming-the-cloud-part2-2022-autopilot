@@ -294,6 +294,34 @@ No ficheiro  é necessário passar o fqdn devolvido pelo modulo de dns.
 
 Na diretória `./modules/external-dns` encontra-se a implementação do modulo `external-dns` que permite atualizar os registos DNS automaticamente.
 
+Executar o `init` pois estamos a introduzir um novo modulo:
+
+```bash
+terraform init
+```
+
+Executar o `plan` & `apply`:
+
+```bash
+terraform plan -out plan.tfplan
+```
+
+```bash
+terraform apply plan.tfplan
+```
+
+Podemos verificar a criação do `external-dns` pelo seguinte comando:
+
+```bash
+kubectl get pods -n external-dns
+```
+
+Podemos também investigar os logs emitidos pelo deployment:
+
+```bash
+kubectl logs -n external-dns -l app=external-dns --follow
+```
+
 ### 3.3 Criar um ponto de entrada (ingress) para o site
 
 > *[from docs:](https://kubernetes.io/docs/concepts/services-networking/ingress/) Ingress exposes HTTP and HTTPS routes from outside the cluster to services within the cluster. Traffic routing is controlled by rules defined on the Ingress resource.*
@@ -315,12 +343,6 @@ A criação do `ingress` será o culminar das últimas operações que efectuamo
 2. Ativar a criação dos manifestos de ingress através da variável boleana `ingress_enabled`.
 
    * `ingress_enabled = true`
-
-Executar o `init`:
-
-```bash
-terraform init
-```
 
 Executar o `plan` & `apply`:
 
