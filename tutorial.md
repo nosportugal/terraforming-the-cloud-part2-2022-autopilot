@@ -14,12 +14,6 @@
 
 **Pré requisitos**: Antes de começares, é necessário verificares algumas coisas:
 
-Junta-te à **Cloud Guild** no Teams e segue os tutorias da Wiki do GCP.
-
-Depois pede para te adicionarem ao projeto no GCP.
-
-De seguida vais ter de configurar o GCP. Se já tens o `gcloud` instalado corre este comando:
-
 **NOTA: Se estás a executar tutorial na cloudshell (consola do GCP), não precisas de correr este comando.**
 
 ```bash
@@ -31,7 +25,8 @@ Podes econtrar mais info sobre a auth [aqui](https://registry.terraform.io/provi
 Certifica-te que tens a `google-cloud-shell` devidamente autorizada correndo este comando:
 
 ```bash
-gcloud config set project tf-gke-lab-01-np-000001
+gcloud config set project <project-id> &&
+gcloud config set accessibility/screen_reader false
 ```
 
 De seguida, clica no botão **Start** para começares.
@@ -164,7 +159,7 @@ Podemos verificar que o nosso cluster foi corretamente criado através do comand
 gcloud container clusters list --project $(terraform output -raw project_id) | grep $(terraform output -raw my_identifier)
 ```
 
-*Também é possivel verificar o estado do cluster pela GUI [aqui](https://console.cloud.google.com/kubernetes/list?project=tf-gke-lab-01-np-000001).*
+*Também é possivel verificar o estado do cluster pela GUI [aqui](https://console.cloud.google.com/kubernetes/list).*
 
 ### 2.3 Aceder ao cluster
 

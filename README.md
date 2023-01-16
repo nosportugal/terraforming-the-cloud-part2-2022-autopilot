@@ -78,7 +78,8 @@ Abrir o editor na pasta do projeto:
 E agora que têm o editor pronto, podemos autenticar a consola com o GCP:
 
 ```bash
-gcloud config set project tf-gke-lab-01-np-000001
+gcloud config set project <project-id> &&
+gcloud config set accessibility/screen_reader false
 ```
 
 ## configurar o vscode
@@ -106,7 +107,7 @@ gcloud init
 gcloud auth application-default login
 
 # definir o projeto por defeito (opcional)
-gcloud config set project tf-gke-lab-01-np-000001
+gcloud config set project <project-id>
 ```
 
 Por fim, podemos clonar o projeto:
@@ -147,7 +148,7 @@ gcloud compute network-endpoint-groups list
 gcloud compute network-endpoint-groups delete <id>
 
 # delete multiple negs at once
-gcloud compute network-endpoint-groups delete $(gcloud compute network-endpoint-groups list --format="value(name)" --project tf-gke-lab-01-np-000001)
+gcloud compute network-endpoint-groups delete $(gcloud compute network-endpoint-groups list --format="value(name)")
 
 # verificar as versoes dos release channels
 gcloud container get-server-config --format "yaml(channels)" --zone europe-west1-b

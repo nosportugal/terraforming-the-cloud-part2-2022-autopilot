@@ -2,7 +2,6 @@
 variable "project_id" {
   description = "The project id to work with"
   type        = string
-  default     = "tf-gke-lab-01-np-000001"
 }
 
 variable "region" {
@@ -17,10 +16,16 @@ variable "gke_location" {
   default     = "europe-west1"
 }
 
-variable "sa_gke_dns" {
+variable "dns_admin_serviceaccount" {
   description = "represents the service account that will be used to manage dns records"
   type        = string
-  default     = "sa-gke-dns@tf-gke-lab-01-np-000001.iam.gserviceaccount.com"
+  default     = "dns-admin"
+}
+
+variable "dns_master_zone_name" {
+  description = "The DNS master zone name for creating NS records."
+  type        = string
+  default     = "dns-master-zone"
 }
 
 variable "user_prefix" {
