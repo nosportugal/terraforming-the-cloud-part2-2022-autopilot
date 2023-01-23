@@ -7,7 +7,8 @@ locals {
       roles = [
         "roles/editor",
         "roles/iap.tunnelResourceAccessor",
-        "roles/container.admin"
+        "roles/container.admin",
+        "roles/iam.serviceAccountAdmin"
       ]
     },
     {
@@ -38,4 +39,10 @@ resource "google_project_iam_member" "this" {
   depends_on = [
     google_project_service.this
   ]
+}
+
+resource "google_service_account_iam_member" "external_dns" {
+  service_account_id = google_service_account.dns_admin.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "serviceAccount:${data.google_project.this.project_id}.svc.id.goog[external-dns/external-dns]"
 }
