@@ -9,6 +9,12 @@ locals {
         "roles/iap.tunnelResourceAccessor",
         "roles/container.admin"
       ]
+    },
+    {
+      member = "serviceAccount:${google_service_account.dns_admin.email}"
+      roles = [
+        "roles/dns.admin"
+      ]
     }
   ]
 
