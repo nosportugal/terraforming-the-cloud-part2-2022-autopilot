@@ -5,5 +5,10 @@ variable "project_id" {
 
 variable "prefix" {
   description = "the prefix to be used"
-  type = string
+  type        = string
+}
+
+variable "dns_master_zone_name" {
+  description = "The DNS master zone name for creating NS records."
+  type        = string
 }

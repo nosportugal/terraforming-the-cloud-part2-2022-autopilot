@@ -1,7 +1,8 @@
 
 # 3.2 Habilitar o external-dns
-data "google_service_account" "gke_dns" {
-  account_id = var.sa_gke_dns
+data "google_service_account" "dns_admin" {
+  project    = var.project_id
+  account_id = var.dns_admin_serviceaccount
 }
 
 ## Aqui usamos o provider `kubernetes` para criar o namespace
@@ -27,7 +28,7 @@ resource "helm_release" "external_dns" {
   serviceAccount:
     create: true
     annotations:
-      iam.gke.io/gcp-service-account: ${data.google_service_account.gke_dns.email}
+      iam.gke.io/gcp-service-account: ${data.google_service_account.dns_admin.email}
     name: external-dns
 
   sources:

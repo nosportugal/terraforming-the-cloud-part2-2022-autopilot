@@ -4,10 +4,12 @@ variable "project_id" {
 }
 
 variable "fqdn" {
+  description = "The fully qualified domain name of the project."
   type = string
   default = ""
 }
 
-variable "sa_gke_dns" {
+variable "dns_admin_serviceaccount" {
+  description = "The serviceaccount that will be used to implement the workload-identity"
   type = string
 }

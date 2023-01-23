@@ -1,8 +1,7 @@
 ## DNS management
 locals {
-  fqdn                 = trim(local.dns_name, ".")
-  dns_name             = "${var.prefix}.${data.google_dns_managed_zone.workshop_zone.dns_name}"
-  dns_workshop_zone_name = "dns-workshop"
+  fqdn     = trim(local.dns_name, ".")
+  dns_name = "${var.prefix}.${data.google_dns_managed_zone.workshop_zone.dns_name}"
 }
 
 
@@ -13,7 +12,7 @@ data "google_project" "this" {
 ## Esta é a zona da workshop: wshop.company.com
 ## É nesta zona que iremos criar sub-zonas, uma para cada aluno
 data "google_dns_managed_zone" "workshop_zone" {
-  name    = local.dns_parent_zone_name
+  name    = var.dns_master_zone_name
   project = data.google_project.this.name
 }
 
