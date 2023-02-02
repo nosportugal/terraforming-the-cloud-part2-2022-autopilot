@@ -10,12 +10,6 @@ locals {
         "roles/container.admin",
         "roles/iam.serviceAccountAdmin"
       ]
-    },
-    {
-      member = "serviceAccount:${google_service_account.dns_admin.email}"
-      roles = [
-        "roles/dns.admin"
-      ]
     }
   ]
 
@@ -38,6 +32,19 @@ resource "google_project_iam_member" "this" {
   #Cloud Build creates the SA after enabling the API, so we need it to be enabled first
   depends_on = [
     google_project_service.this
+  ]
+}
+
+# we separated this from the other assignment to prevent the terraform -target error
+resource "google_project_iam_member" "dns_admin_sa" {
+  project  = data.google_project.this.name
+  role     = "roles/dns.admin"
+  member   = "serviceAccount:${google_service_account.dns_admin.email}"
+
+  #Cloud Build creates the SA after enabling the API, so we need it to be enabled first
+  depends_on = [
+    google_project_service.this,
+    google_project_iam_member.this
   ]
 }
 
