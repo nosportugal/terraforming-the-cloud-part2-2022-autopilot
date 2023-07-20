@@ -26,6 +26,12 @@
 #    range_name    = "${local.prefix}-subnet-gkeservices"
 #    ip_cidr_range = "240.0.128.32/27"
 #  }
+#
+#  log_config { # This is required due to an organization policy
+#    aggregation_interval = "INTERVAL_10_MIN"
+#    flow_sampling        = 0.3
+#    metadata             = "EXCLUDE_ALL_METADATA"
+#  }
 # }
 
 # resource "google_compute_router" "default" {

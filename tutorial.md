@@ -12,21 +12,12 @@
 
 **Tempo estimado**: Cerca de 2 horas
 
-**Pré requisitos**: Antes de começares, é necessário verificares algumas coisas:
-
-**NOTA: Se estás a executar tutorial na cloudshell (consola do GCP), não precisas de correr este comando.**
-
-```bash
-gcloud auth application-default login
-```
-
-Podes econtrar mais info sobre a auth [aqui](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/getting_started).
+**Pré requsitos**: Antes de começares, é necessário verificares algumas coisas:
 
 Certifica-te que tens a `google-cloud-shell` devidamente autorizada correndo este comando:
 
 ```bash
-gcloud config set project <project-id> &&
-gcloud config set accessibility/screen_reader false
+gcloud config set project tf-gke-lab-01-np-000001 && gcloud config set accessibility/screen_reader false
 ```
 
 De seguida, clica no botão **Start** para começares.
@@ -35,7 +26,7 @@ De seguida, clica no botão **Start** para começares.
 
 Neste projeto temos que preparar um prefixo que identifique unicamente os recursos que vão ser criados, por forma a evitar colisões.
 
-* No ficheiro `./terraform.tfvars` é necessário definir um prefixo, no seguinte formato: `user_prefix = "<valor>"`
+* No ficheiro <walkthrough-editor-select-line filePath="terraform.tfvars" startLine="2" endLine="2" startCharacterOffset="0" endCharacterOffset="200">terraform.tfvars</walkthrough-editor-select-line> é necessário definir um prefixo, no seguinte formato: `user_prefix = "<valor>"`
 
 Inicializar:
 
@@ -43,11 +34,24 @@ Inicializar:
 terraform init
 ```
 
+---
+
 Planear:
 
 ```bash
 terraform plan -out plan.tfplan
 ```
+
+💡Para evitar que o terraform peça o nome do projeto a cada `plan`, podemos definir o nome do projeto por defeito:
+
+* Abrir o ficheiro <walkthrough-editor-select-line filePath="terraform.tfvars" startLine="1" endLine="1" startCharacterOffset="0" endCharacterOffset="200">terraform.tfvars</walkthrough-editor-select-line>.
+* Descomentar a linha `project_id` e adicionar o id do projeto que aparece a amarelo na linha de comandos.
+
+💡Notem que a variavel `user_prefix` tem uma validação declarada no ficheiro <walkthrough-editor-select-line filePath="variables.tf" startLine="30" endLine="38" startCharacterOffset="0" endCharacterOffset="200">variables.tf</walkthrough-editor-select-line>. Caso estejam a ter um erro, é preciso garantir queo nome escolhido cumpre com as regrqas de validação.
+
+> *[from docs:](https://developer.hashicorp.com/terraform/language/values/variables#custom-validation-rules) You can specify custom validation rules for a particular variable by adding a validation block within the corresponding variable block. The example below checks whether the AMI ID has the correct syntax.*
+
+---
 
 Aplicar:
 
@@ -55,15 +59,20 @@ Aplicar:
 terraform apply plan.tfplan
 ```
 
-## 1. criar a VPC
+## 1. Criar VPC e Subnet
 
-* No ficheiro `./vpc.tf` encontram-se as definições da VPC a usar
+* No ficheiro <walkthrough-editor-open-file filePath="vpc.tf">vpc.tf</walkthrough-editor-open-file> encontram-se as definições da VPC e respetiva subnet a usar
 
-👉 Descomentar as seguintes resources:
+👉 <walkthrough-editor-select-line filePath="vpc.tf" startLine="4" endLine="50" startCharacterOffset="0" endCharacterOffset="200">Descomentar as seguintes resources</walkthrough-editor-select-line>:
 
-* `resource "google_compute_network" "default"`
+* <walkthrough-editor-select-line filePath="vpc.tf" startLine="4" endLine="9" startCharacterOffset="0" endCharacterOffset="200">`resource "google_compute_network" "default"`</walkthrough-editor-select-line>
+* <walkthrough-editor-select-line filePath="vpc.tf" startLine="11" endLine="32" startCharacterOffset="0" endCharacterOffset="200">`resource "google_compute_subnetwork" "gke"`</walkthrough-editor-select-line>
+* <walkthrough-editor-select-line filePath="vpc.tf" startLine="34" endLine="39" startCharacterOffset="0" endCharacterOffset="200">`resource "google_compute_router" "default"`</walkthrough-editor-select-line>
+* <walkthrough-editor-select-line filePath="vpc.tf" startLine="41" endLine="48" startCharacterOffset="0" endCharacterOffset="200">`resource "google_compute_router_nat" "default"`</walkthrough-editor-select-line>
 
-*Tip: `CTRL+K+U` é o atalho para descomentar em bloco*
+<sub>💡ProTip: `CTRL+K+U` é o atalho para descomentar em bloco</sub>
+
+**Why**: Tanto o `router` como o `nat` são recursos necessários para permitir que o cluster GKE possa aceder à internet para fazer download das imagens dos containers que vamos usar.
 
 Executar o `plan` & `apply`:
 
@@ -75,50 +84,27 @@ terraform plan -out plan.tfplan
 terraform apply plan.tfplan
 ```
 
-Validar the a VPC foi criada com a respetiva subnet:
+---
+
+Validar the a VPC foi criada:
 
 ```bash
 gcloud compute networks list | grep $(terraform output -raw my_identifier)
+```
+
+Validar que a subnet foi criada:
+
+```bash
+gcloud compute networks subnets list | grep "$(terraform output -raw my_identifier)"
 ```
 
 ## 2. Modules & GKE
 
 Neste capitulo iremos abordar a utilização de [terraform modules](https://www.terraform.io/docs/language/modules/syntax.html) para instanciar o GKE.
 
-### 2.1 GKE subnet
+### 2.1 Introdução aos modulos
 
-Para aprovisionar um GKE é necessário uma subnet. Esta subnet será usada para endereçar as as principais componentes do GKE: `pods`, `services` e `nodes`.
-
-* No ficheiro `./vpc.tf` encontram-se as definições da VPC a usar para o GKE
-* Também poderiamos configurar a subnet no modulo, mas dificulta a gestão transversal da VPC
-
-👉 No ficheiro `./vpc.tf`, descomentar as seguintes resources:
-
-* `resource "google_compute_subnetwork" "gke"`
-* `resource "google_compute_router" "default"`
-* `resource "google_compute_router_nat" "default"`
-
-**Why**: Tanto o `router` como o `nat` são recursos necessários para permitir que o cluster GKE possa aceder à internet para fazer download das imagens dos containers que vamos usar._
-
-Executar o `plan` & `apply`:
-
-```bash
-terraform plan -out plan.tfplan
-```
-
-```bash
-terraform apply plan.tfplan
-```
-
-Podemos verificar que a subnet foi corretamente criada:
-
-```bash
-gcloud compute networks subnets list --uri | grep "$(terraform output -raw my_identifier)"
-```
-
-### 2.2 GKE module
-
-Agora que temos a subnet preparada, iremos entao proceder à primeira aplicação de um [terraform module](https://www.terraform.io/docs/language/modules/syntax.html) para aprovisionar um cluster GKE.
+Exemplo demonstrativo da organização de modulos no slide 12 da apresentação.
 
 > *[from docs:](https://www.terraform.io/docs/language/modules/syntax.html) A module is a container for multiple resources that are used together.*
 >
@@ -126,10 +112,15 @@ Agora que temos a subnet preparada, iremos entao proceder à primeira aplicaçã
 >
 > *A module can call other modules, which lets you include the child module's resources into the configuration in a concise way. Modules can also be called multiple times, either within the same configuration or in separate configurations, allowing resource configurations to be packaged and re-used.*
 
-* No ficheiro `./gke.tf` encontra-se a invocação do module
+### 2.2 GKE module
+
+Agora que temos os pre-requisitos instalados, iremos entao proceder à primeira aplicação de um [terraform module](https://www.terraform.io/docs/language/modules/syntax.html) para aprovisionar um cluster GKE.
+
+
+* No ficheiro <walkthrough-editor-select-line filePath="gke.tf" startLine="1" endLine="15" startCharacterOffset="0" endCharacterOffset="200">./gke.tf</walkthrough-editor-select-line> encontra-se a invocação do module
 * Por cada module é preciso fazer `terraform init`
 
-👉 No ficheiro `./gke.tf`, descomentar as seguintes resources:
+👉 No ficheiro <walkthrough-editor-select-line filePath="gke.tf" startLine="1" endLine="15" startCharacterOffset="0" endCharacterOffset="200">./gke.tf</walkthrough-editor-select-line>, descomentar as seguintes resources:
 
 * `module "gke"`
 * `output "gke_name"`
@@ -185,12 +176,12 @@ Trata-se de um provider da comunidade que tal como o nome indica, facilita a uti
 
 > *[from docs:](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs) This provider is the best way of managing Kubernetes resources in Terraform, by allowing you to use the thing Kubernetes loves best - yaml!*
 
-👉 Para habilitar o modulo, temos que ir ao ficheiro `./k8s.hipster.tf` e descomentar o seguinte modulo:
+👉 Para habilitar o modulo, temos que ir ao ficheiro <walkthrough-editor-open-file filePath="k8s.hipster.tf">`./k8s.hipster.tf`</walkthrough-editor-open-file> e descomentar o seguinte modulo:
 
-* `module "hipster"`
-* ❗❗ **não** descomentar a linha `fqdn`; será habilitado mais a frente ❗❗
+* <walkthrough-editor-select-line filePath="k8s.hipster.tf" startLine="2" endLine="13" startCharacterOffset="0" endCharacterOffset="200">`module "hipster"`</walkthrough-editor-select-line>
+* ⛔ **não** descomentar a linha <walkthrough-editor-select-line filePath="k8s.hipster.tf" startLine="7" endLine="7" startCharacterOffset="0" endCharacterOffset="200">`fqdn`</walkthrough-editor-select-line>; será habilitado mais a frente ⛔
 
-Os microserviços utilizados nesta demo, encontram-se [neste registry](https://console.cloud.google.com/gcr/images/google-samples/global/microservices-demo). Antes de inicializarem o módulo, verifiquem que as versões destes microserviços (passar pelos ficheiros `./hipster-demo/k8s/*.yaml` ) ainda existem.
+💡Os microserviços utilizados nesta demo, encontram-se [neste registry](https://console.cloud.google.com/gcr/images/google-samples/global/microservices-demo) e o respetivo código [neste repositório de github](https://github.com/GoogleCloudPlatform/microservices-demo/tree/main).
 
 Executar `terraform init` para inicializar o modulo:
 
@@ -245,12 +236,12 @@ Conseguimos validar que os workloads estao a funcionar.
 
 ### 3.1 Criar a zona de DNS
 
-No ficheiro `./dns.tf` encontra-se a definição do modulo.
+No ficheiro <walkthrough-editor-open-file filePath="dns.tf">`./dns.tf`</walkthrough-editor-open-file> encontra-se a definição do modulo.
 
-👉 Para habilitar o modulo `./dns.tf` precisamos de descomentar as seguintes resources:
+👉 Para habilitar o modulo <walkthrough-editor-select-line filePath="dns.tf" startLine="1" endLine="10" startCharacterOffset="0" endCharacterOffset="200">`./dns.tf`</walkthrough-editor-select-line> precisamos de descomentar as seguintes resources:
 
-* `module "dns"`
-* `output "fqdn"`
+* <walkthrough-editor-select-line filePath="dns.tf" startLine="1" endLine="6" startCharacterOffset="0" endCharacterOffset="200">`module "dns"`</walkthrough-editor-select-line>
+* <walkthrough-editor-select-line filePath="dns.tf" startLine="8" endLine="10" startCharacterOffset="0" endCharacterOffset="200">`output "fqdn"`</walkthrough-editor-select-line>
 
 Executar `terraform init` para inicializar o modulo:
 
@@ -282,10 +273,10 @@ O `external-dns` é a *cola* entre o Kubernetes e o DNS.
 
 No ficheiro  é necessário passar o fqdn devolvido pelo modulo de dns.
 
-👉 Descomentar o modulo `external_dns` ficheiro `./k8s.external-dns.tf`:
+👉 Descomentar o modulo <walkthrough-editor-select-line filePath="k8s.external-dns.tf" startLine="1" endLine="11" startCharacterOffset="0" endCharacterOffset="200">`external_dns`</walkthrough-editor-select-line> no ficheiro <walkthrough-editor-open-file filePath="k8s.external-dns.tf">`./k8s.external-dns.tf`</walkthrough-editor-open-file>:
 
-* `module "external_dns"`
-* `output "fqdn"`
+* <walkthrough-editor-select-line filePath="k8s.external-dns.tf" startLine="1" endLine="5" startCharacterOffset="0" endCharacterOffset="200">`module "external_dns"`</walkthrough-editor-select-line>
+* <walkthrough-editor-select-line filePath="k8s.external-dns.tf" startLine="7" endLine="11" startCharacterOffset="0" endCharacterOffset="200">`output "fqdn"`</walkthrough-editor-select-line>
 
 Na diretória `./modules/external-dns` encontra-se a implementação do modulo `external-dns` que permite atualizar os registos DNS automaticamente.
 
@@ -329,15 +320,15 @@ A criação do `ingress` será o culminar das últimas operações que efectuamo
 * Uma vez criado o registo no DNS, o GCE irá aprovisionar o certificado automaticamente;
 * ⏰ Todo o processo pode levar até cerca de **10 minutos** a acontecer;
 
-👉 No ficheiro `./k8s.hipster.tf` iremos descomentar a secção **3.3** onde iremos modificar o comportamento do modulo da seguinte forma:
+👉 No ficheiro <walkthrough-editor-select-line filePath="k8s.hipster.tf" startLine="7" endLine="8" startCharacterOffset="0" endCharacterOffset="200">`./k8s.hipster.tf`</walkthrough-editor-select-line> iremos descomentar a secção **3.3** onde iremos modificar o comportamento do modulo da seguinte forma:
 
 1. Atribuir o `fqdn` dado pelo modulo de `dns`  á variável `fqdn`; o `fqdn` representa o domínio onde vai ser criado o host declarado pelo `ingress`.
 
-   * `fqdn = module.dns.fqdn`
+   * <walkthrough-editor-select-line filePath="k8s.hipster.tf" startLine="7" endLine="7" startCharacterOffset="0" endCharacterOffset="200">`fqdn = module.dns.fqdn`</walkthrough-editor-select-line>
 
 2. Ativar a criação dos manifestos de ingress através da variável boleana `ingress_enabled`.
 
-   * `ingress_enabled = true`
+   * <walkthrough-editor-select-line filePath="k8s.hipster.tf" startLine="8" endLine="8" startCharacterOffset="0" endCharacterOffset="200">`ingress_enabled = true`</walkthrough-editor-select-line>
 
 Executar o `plan` & `apply`:
 

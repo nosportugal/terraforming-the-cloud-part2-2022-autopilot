@@ -7,7 +7,7 @@ Temas abordados neste modulo:
 * Criação de [modulos de Terraform](https://www.terraform.io/docs/language/modules/syntax.html)
 * Criação de [cluster GKE](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster)
 * Criação de [zonas de DNS](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/dns_managed_zone)
-* Utilização de diferentes providers ([kubectl provider](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs))
+* Utilização de diferentes providers ([kubectl provider](https://registry.terraform.io/providers/alekc/kubectl/latest/docs))
 * [Templates de ficheiros](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file)
 
 ## iniciar o tutorial (setup automatico)
