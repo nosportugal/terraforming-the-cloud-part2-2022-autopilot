@@ -1,5 +1,7 @@
 # terraforming the cloud - part 2
 
+- version 2023-10-22
+
 ![Terraforming the cloud architecture][tfc-arch]
 
 Temas abordados neste modulo:
