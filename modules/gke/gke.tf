@@ -16,8 +16,9 @@ resource "google_container_cluster" "default" {
   network    = local.gke.network
   subnetwork = local.gke.subnetwork
 
-  min_master_version = local.gke.min_master_version
-  enable_autopilot   = true # esta flag indica que o cluster  vai ser instanciado em modo autopilot
+  min_master_version  = local.gke.min_master_version
+  enable_autopilot    = true # esta flag indica que o cluster  vai ser instanciado em modo autopilot
+  deletion_protection = false
 
   release_channel {
     channel = local.gke.release_channel
