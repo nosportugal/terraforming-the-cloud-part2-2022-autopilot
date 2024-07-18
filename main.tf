@@ -1,6 +1,6 @@
 ## terraform & providers
 terraform {
-  required_version = ">= 1.6.0"
+  required_version = ">= 1.5.7"
   backend "local" {
     path = "terraform.tfstate"
   }
@@ -12,16 +12,16 @@ terraform {
     }
 
     kubectl = {
-      source = "alekc/kubectl"
-      version = "2.0.3"
+      source  = "alekc/kubectl"
+      version = "2.0.4"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "~> 2.11"
+      version = "~> 2.14"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2.23"
+      version = "~> 2.31"
     }
   }
 }
