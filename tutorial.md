@@ -116,7 +116,6 @@ Exemplo demonstrativo da organização de modulos no slide 12 da apresentação.
 
 Agora que temos os pre-requisitos instalados, iremos entao proceder à primeira aplicação de um [terraform module](https://www.terraform.io/docs/language/modules/syntax.html) para aprovisionar um cluster GKE.
 
-
 * No ficheiro <walkthrough-editor-select-line filePath="gke.tf" startLine="1" endLine="15" startCharacterOffset="0" endCharacterOffset="200">./gke.tf</walkthrough-editor-select-line> encontra-se a invocação do module
 * Por cada module é preciso fazer `terraform init`
 
