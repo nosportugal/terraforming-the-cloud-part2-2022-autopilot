@@ -1,4 +1,4 @@
-# 3.2 Habilitar o external-dns
+## 3.2 Habilitar o external-dns
 # module "external_dns" {
 #   source                   = "./modules/external-dns"
 #   project_id               = var.project_id
